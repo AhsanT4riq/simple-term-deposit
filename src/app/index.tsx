@@ -1,15 +1,16 @@
-import { Text, View } from 'react-native';
+import React from 'react';
+import { ScrollView } from 'react-native';
+
+import TermDepositForm from '@/src/components/TermDepositForm';
 
 export default function Index() {
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
+    <ScrollView
+      className="flex-1 pt-safe"
+      showsVerticalScrollIndicator={false}
+      keyboardShouldPersistTaps="handled"
     >
-      <Text>Edit app/index.tsx to edit this screen.</Text>
-    </View>
+      <TermDepositForm />
+    </ScrollView>
   );
 }
