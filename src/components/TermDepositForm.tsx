@@ -15,7 +15,7 @@ const TermDepositForm = () => {
     { label: 'Monthly', value: 'monthly' },
     { label: 'Quarterly', value: 'quarterly' },
     { label: 'Annually', value: 'annually' },
-    { label: 'At Maturity', value: 'at maturity' },
+    { label: 'At Maturity', value: 'maturity' },
   ] as const;
 
   const handleSubmit = () => {
