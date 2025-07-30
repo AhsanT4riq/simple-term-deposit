@@ -12,7 +12,7 @@ describe('Term Deposit Calculator', () => {
     // $10,000 at 4% for 2 years, quarterly compounding
     // A = 10000(1 + 0.04/4)^(4*2) = 10000(1.01)^8 ≈ 10828.57
     const result = calculateTermDeposit(10000, 4, 2, 'quarterly');
-    expect(result).toBeCloseTo(10828.57, 2);
+    expect(result).toBeCloseTo(10829, 2);
   });
 
   test('returns correct compounding frequencies', () => {

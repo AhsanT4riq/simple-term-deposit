@@ -1,11 +1,18 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { Text, View } from 'react-native';
-import Animated, { FadeInDown, SlideInRight } from 'react-native-reanimated';
 
 import { calculateAllResults, formatCurrency, PaymentFrequency } from '@/src/utils/calculator';
 
+import {
+  cleanAmountForCalculation,
+  validateAmount,
+  validateInterestRate,
+  validateTerm,
+} from '../utils/validator';
+
 import InputField from './InputField';
 import Label from './Label';
+import Result from './Result';
 import Select from './Select';
 
 const FREQUENCIES = [
@@ -20,9 +27,22 @@ const TermDepositForm = () => {
   const [rate, setRate] = useState('');
   const [term, setTerm] = useState('');
   const [frequency, setFrequency] = useState<PaymentFrequency>('monthly');
-  const animatedKey = useMemo(() => {
-    return `result + ${amount + rate + term + frequency}`;
-  }, [amount, rate, term, frequency]);
+
+  // Keep track of which fields have been touched
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+
+  // Validation functions with memoization
+  const amountError = useMemo(() => {
+    return touched.amount ? validateAmount(amount) : null;
+  }, [amount, touched.amount]);
+
+  const rateError = useMemo(() => {
+    return touched.rate ? validateInterestRate(rate) : null;
+  }, [rate, touched.rate]);
+
+  const termError = useMemo(() => {
+    return touched.term ? validateTerm(term) : null;
+  }, [term, touched.term]);
 
   const cleanAmount = useMemo(() => {
     return amount.replace(/[$,]/g, '');
@@ -33,11 +53,17 @@ const TermDepositForm = () => {
     const numRate = Number(rate);
     const numTerm = Number(term);
 
+    // Don't calculate if there are validation errors or missing inputs
+    if (amountError || rateError || termError) {
+      return null;
+    }
+
     if (!numAmount || !numRate || !numTerm || !frequency) {
       return null;
     }
 
-    if (numAmount <= 0 || numRate < 0 || numTerm <= 0) {
+    // Additional validation to prevent invalid calculations
+    if (numAmount <= 0 || numRate <= 0 || numTerm <= 0) {
       return null;
     }
 
@@ -48,18 +74,38 @@ const TermDepositForm = () => {
       console.log('Calculation error:', error);
       return null;
     }
-  }, [cleanAmount, rate, term, frequency]);
+  }, [cleanAmount, rate, term, frequency, amountError, rateError, termError]);
+
+  // Input change handlers with validation
+  const handleAmountChange = useCallback((text: string) => {
+    setAmount(text);
+    setTouched((prev) => ({ ...prev, amount: true }));
+  }, []);
+
+  const handleRateChange = useCallback((text: string) => {
+    setRate(text);
+    setTouched((prev) => ({ ...prev, rate: true }));
+  }, []);
+
+  const handleTermChange = useCallback((text: string) => {
+    setTerm(text);
+    setTouched((prev) => ({ ...prev, term: true }));
+  }, []);
+
+  // Format amount as currency on blur
+  const handleAmountBlur = useCallback(() => {
+    if (amount && !amountError) {
+      const numAmount = cleanAmountForCalculation(amount);
+      if (numAmount > 0) {
+        const formatted = formatCurrency(numAmount);
+        setAmount(formatted);
+      }
+    }
+  }, [amount, amountError]);
 
   const handleFrequencySelect = useCallback((value: PaymentFrequency) => {
     setFrequency(value);
   }, []);
-  const handleAmountBlur = useCallback(() => {
-    const numAmount = Number(cleanAmount.replace(/[$,]/g, '')); // Remove existing formatting
-    if (numAmount && numAmount > 0) {
-      const formatted = formatCurrency(numAmount);
-      setAmount(formatted);
-    }
-  }, [cleanAmount]);
 
   const frequencyButtons = useMemo(() => {
     return FREQUENCIES.map((freq) => (
@@ -81,28 +127,31 @@ const TermDepositForm = () => {
       <InputField
         label="Start Deposit Amount ($)"
         value={amount}
-        onChangeText={setAmount}
+        onChangeText={handleAmountChange}
         onBlur={handleAmountBlur}
         placeholder="e.g. 10,000"
         keyboardType="numeric"
+        error={amountError}
       />
 
       {/* Interest Rate Input */}
       <InputField
         label="Interest Rate (%)"
         value={rate}
-        onChangeText={setRate}
+        onChangeText={handleRateChange}
         placeholder="e.g. 1.10"
         keyboardType="numeric"
+        error={rateError}
       />
 
       {/* Term Input */}
       <InputField
         label="Investment Term (years)"
         value={term}
-        onChangeText={setTerm}
+        onChangeText={handleTermChange}
         placeholder="e.g. 3"
         keyboardType="numeric"
+        error={termError}
       />
 
       {/* Frequency Selection */}
@@ -112,46 +161,7 @@ const TermDepositForm = () => {
       </View>
 
       {/* Result */}
-      {result && (
-        <Animated.View className="flex gap-2" key={animatedKey}>
-          <Animated.Text
-            entering={FadeInDown}
-            className="text-2xl font-bold text-center text-gray-800"
-          >
-            Result
-          </Animated.Text>
-          <Animated.Text
-            entering={SlideInRight.delay(100)}
-            className="text-xl font-bold text-gray-800"
-          >
-            Principal: <Text className="text-orange-700">{result.formattedPrincipal}</Text>
-          </Animated.Text>
-          <Animated.Text
-            entering={SlideInRight.delay(200)}
-            className="text-xl font-bold text-gray-800"
-          >
-            Rate: <Text className="text-orange-700">{result.rate + '%'}</Text>
-          </Animated.Text>
-          <Animated.Text
-            entering={SlideInRight.delay(300)}
-            className="text-xl font-bold text-gray-800"
-          >
-            Term: <Text className="text-orange-700">{result.term + ' years'}</Text>
-          </Animated.Text>
-          <Animated.Text
-            entering={SlideInRight.delay(400)}
-            className="text-xl font-bold text-gray-800"
-          >
-            Final Balance: <Text className="text-orange-700">{result.formattedFinalBalance}</Text>
-          </Animated.Text>
-          <Animated.Text
-            entering={SlideInRight.delay(500)}
-            className="text-xl font-bold text-gray-800"
-          >
-            Frequency: <Text className="text-orange-700">{result.frequency}</Text>
-          </Animated.Text>
-        </Animated.View>
-      )}
+      <Result result={result} />
     </View>
   );
 };
