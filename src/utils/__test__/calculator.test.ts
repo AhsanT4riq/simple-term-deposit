@@ -21,7 +21,6 @@ describe('Term Deposit Calculator', () => {
     expect(getFrequency('annually')).toBe(1);
     expect(getFrequency('maturity')).toBe(1);
   });
-
   test('calculateAllResults returns complete result object', () => {
     const result = calculateAllResults(10000, 1.1, 3, 'maturity');
 

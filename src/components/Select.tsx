@@ -1,10 +1,12 @@
 import { Text, TouchableOpacity } from 'react-native';
 
+import { PaymentFrequency } from '@/src/utils/calculator';
+
 interface SelectProps {
   value: string;
   label: string;
   onPress: () => void;
-  frequency: string;
+  frequency: PaymentFrequency;
 }
 
 const Select = ({ value, label, onPress, frequency }: SelectProps) => {

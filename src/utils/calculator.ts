@@ -9,18 +9,6 @@ export interface CalculationResult {
   formattedFinalBalance: string;
   formattedPrincipal: string;
 }
-
-export const getFrequency = (frequency: PaymentFrequency): number => {
-  const frequencies: Record<PaymentFrequency, number> = {
-    monthly: 12,
-    quarterly: 4,
-    annually: 1,
-    maturity: 1,
-  };
-
-  return frequencies[frequency.toLowerCase() as PaymentFrequency] || 1;
-};
-
 /**
  * Calculate term deposit final balance
  *
@@ -49,19 +37,9 @@ export const calculateTermDeposit = (
   const n = getFrequency(frequency);
   const amount = principal * Math.pow(1 + rate / n, n * years);
 
-  return Math.round(amount * 100) / 100;
+  return Math.round(amount);
 };
 
-/* Format number as Australian currency */
-export const formatCurrency = (amount: number): string => {
-  return new Intl.NumberFormat('en-AU', {
-    style: 'currency',
-    currency: 'AUD',
-    minimumFractionDigits: 2,
-  }).format(amount);
-};
-
-/* Calculate and return all results in a formatted object */
 export const calculateAllResults = (
   principal: number,
   annualRate: number,
@@ -79,4 +57,22 @@ export const calculateAllResults = (
     formattedFinalBalance: formatCurrency(finalBalance),
     formattedPrincipal: formatCurrency(principal),
   };
+};
+
+export const getFrequency = (frequency: PaymentFrequency): number => {
+  const frequencies: Record<PaymentFrequency, number> = {
+    monthly: 12,
+    quarterly: 4,
+    annually: 1,
+    maturity: 1,
+  };
+
+  return frequencies[frequency.toLowerCase() as PaymentFrequency] || 1;
+};
+
+export const formatCurrency = (amount: number): string => {
+  return new Intl.NumberFormat('en-AU', {
+    style: 'currency',
+    currency: 'AUD',
+  }).format(amount);
 };
