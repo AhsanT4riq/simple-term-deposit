@@ -1,50 +1,85 @@
-# Welcome to your Expo app 👋
+# Simple Term Deposit Calculator
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Term Deposit Calculator built with React Native, Expo, and TypeScript.
 
-## Get started
+## Project Structure
 
-1. Install dependencies
-
-   ```bash
-   npm install
-   ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+simple-term-deposit/
+├── src/
+│   ├── app/                    # Expo Router pages
+│   │   ├── _layout.tsx         # Root layout
+│   │   └── index.tsx           # Home screen
+│   ├── components/             # Reusable UI components
+│   │   ├── InputField.tsx      # Form input with validation
+│   │   ├── Label.tsx           # Form labels
+│   │   ├── Result.tsx          # Calculation results display
+│   │   ├── Select.tsx          # Dropdown selector
+│   │   └── TermDepositForm.tsx # Main calculator form
+│   └── utils/                  # Business logic & utilities
+│       ├── calculator.ts       # Interest calculation logic
+│       ├── validator.ts        # Form validation rules
+│       └── __test__/           # Unit tests
+│           ├── calculator.test.ts
+│           └── validator.test.ts
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Quick Start
 
-## Learn more
+### Prerequisites
 
-To learn more about developing your project with Expo, look at the following resources:
+Make sure you have the following installed on your machine:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+- **Node.js** (v18 or higher) - [Download here](https://nodejs.org/)
+- **Expo CLI** - Install globally: `npm install -g @expo/cli`
+- **Expo Go app** on your mobile device:
+  - [iOS App Store](https://apps.apple.com/app/expo-go/id982107779)
+  - [Google Play Store](https://play.google.com/store/apps/details?id=host.exp.exponent)
 
-## Join the community
+### Installation Steps
 
-Join our community of developers creating universal apps.
+1. **Clone the repository**
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+   ```bash
+   git clone https://github.com/AhsanT4riq/simple-term-deposit.git
+   cd simple-term-deposit
+   ```
+
+2. **Install dependencies**
+
+   ```bash
+   bun install
+   ```
+
+3. **Start the development server**
+
+   ```bash
+   bun start
+   ```
+
+4. **Run on your device/simulator**
+
+   After starting the dev server, you'll see a QR code in your terminal. You can:
+   - Press `a` in terminal or run `bun run android`
+   - Press `i` in terminal or run `bun run ios`
+
+## Running Tests
+
+```bash
+# Run tests
+bun test
+
+# Run with coverage
+bun test --coverage
+```
+
+## Calculation Methods
+
+The app uses different formulas based on payment frequency:
+
+- **Compound Interest**: `A = P(1 + r/n)^(nt)`
+  - P = Principal amount
+  - r = Annual interest rate (decimal)
+  - n = Compounding frequency per year
+  - t = Time in years
+- **Simple Interest** (At Maturity): `A = P(1 + rt)`
